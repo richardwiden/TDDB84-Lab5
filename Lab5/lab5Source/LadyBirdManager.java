@@ -65,10 +65,13 @@ public class LadyBirdManager extends Thread {
 	 */
 	public void run() {
 		while (true) {
-			Iterator iter = ladyBirds.iterator();
-			while (iter.hasNext()) {
-				LadyBird l = (LadyBird) iter.next();
-				l.nextAction();
+			synchronized (ladyBirds) {
+
+				Iterator iter = ladyBirds.iterator();
+				while (iter.hasNext()) {
+					LadyBird l = (LadyBird) iter.next();
+					l.nextAction();
+				}
 			}
 			applet.repaint();
 			try {
@@ -89,9 +92,12 @@ public class LadyBirdManager extends Thread {
 		/**
 		 * Please add code here to remove overlap between them at creation
 		 */
-		//TODO fixme
+		S_Mediator.instance().checkMovement(l, 0);
 
-		ladyBirds.add(l);
+		synchronized (ladyBirds) {
+			ladyBirds.add(l);
+		}
+
 		return l;
 	}
 
@@ -102,7 +108,9 @@ public class LadyBirdManager extends Thread {
 	 *            The ladybird to be removed.
 	 */
 	public void removeLadyBird(LadyBird l) {
-		ladyBirds.removeElement(l);
+		synchronized (ladyBirds) {
+			ladyBirds.removeElement(l);
+		}
 	}
 
 	/**
@@ -112,7 +120,9 @@ public class LadyBirdManager extends Thread {
 	 *            The ladybird.
 	 */
 	public void addLadyBird(LadyBird l) {
-		ladyBirds.add(l);
+		synchronized (ladyBirds) {
+			ladyBirds.add(l);
+		}
 	}
 
 	/**
@@ -126,17 +136,19 @@ public class LadyBirdManager extends Thread {
 	 *            Y coordinate of position.
 	 */
 	public void markLadyBirdAt(int x, int y) {
-		Iterator iter = ladyBirds.iterator();
-		while (iter.hasNext()) {
-			LadyBird l = (LadyBird) iter.next();
-			if (Point2D.distance(l.getX(), l.getY(), x, y) < l.getSize()) {
-				if (markedLadyBird != l) {
-					markedLadyBird = l;
-					return;
+		synchronized (ladyBirds) {
+			Iterator iter = ladyBirds.iterator();
+			while (iter.hasNext()) {
+				LadyBird l = (LadyBird) iter.next();
+				if (Point2D.distance(l.getX(), l.getY(), x, y) < l.getSize()) {
+					if (markedLadyBird != l) {
+						markedLadyBird = l;
+						return;
+					}
 				}
 			}
+			markedLadyBird = null;
 		}
-		markedLadyBird = null;
 	}
 
 	/**
@@ -150,14 +162,17 @@ public class LadyBirdManager extends Thread {
 	 * @return True if it is one there.
 	 */
 	public boolean isLadyBirdAt(int x, int y) {
-		Iterator iter = ladyBirds.iterator();
-		while (iter.hasNext()) {
-			LadyBird l = (LadyBird) iter.next();
-			if (Point2D.distance(l.getX(), l.getY(), x, y) < l.getSize()) {
-				return true;
+		synchronized (ladyBirds) {
+			Iterator iter = ladyBirds.iterator();
+			while (iter.hasNext()) {
+				LadyBird l = (LadyBird) iter.next();
+				if (Point2D.distance(l.getX(), l.getY(), x, y) < l.getSize()) {
+					return true;
+				}
 			}
 		}
 		return false;
+
 	}
 
 	/**
@@ -176,11 +191,12 @@ public class LadyBirdManager extends Thread {
 	 *            Graphics.
 	 */
 	public void paint(Graphics g) {
-		Iterator iter = ladyBirds.iterator();
-		while (iter.hasNext()) {
-			((LadyBird) iter.next()).paint(g);
+		synchronized (ladyBirds) {
+			Iterator iter = ladyBirds.iterator();
+			while (iter.hasNext()) {
+				((LadyBird) iter.next()).paint(g);
+			}
 		}
-
 		if (null != markedLadyBird) {
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setColor(Color.white);
