@@ -25,7 +25,7 @@ public class S_GoingState extends AbstractState {
 		if (l.go()) {
 			l.setState(new NullState());
 		} else {
-			S_Mediator.instance().checkMovement(l);
+			S_Mediator.instance().checkMovement(l,0);
 			l.setState(S_TurningState.instance());
 		}
 	}

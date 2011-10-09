@@ -22,11 +22,25 @@ public class S_Mediator implements Observer {
 		list.remove(l);
 	}
 
-	public void checkMovement(LadyBird l) {
+	public void checkMovement(LadyBird l, int depth) {
+		if(depth>10)
+			return;
 		int size = list.size();
 		for (int i = 0; i < size; i++) {
-			if (!list.get(i).equals(l))
-				list.get(i).collide(l);
+			if (!list.get(i).equals(l)) {
+				
+				if(list.get(i).S_hasCollide(l))
+				{
+					list.get(i).collide(l);
+					list.get(i).setState(S_TurningState.instance());					
+				}
+
+				for (int j = 0; j < size; j++) {
+					if (i != j && list.get(i).S_hasCollide(list.get(j))) {
+						checkMovement(list.get(i),++depth);
+					}
+				}
+			}
 		}
 	}
 

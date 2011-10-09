@@ -33,11 +33,11 @@ public class LadyBird {
 	public LadyBird() {
 		settings = new LadyBirdSettings(32, Color.red, Color.black);
 		settings.addObserver(S_Mediator.instance());
-		x = (int) Math.round(Math.random() * 400);
-		y = (int) Math.round(Math.random() * 400);
+		goalX = x = (int) Math.round(Math.random() * 400);
+		goalY = y = (int) Math.round(Math.random() * 400);
 		angle = Math.round(Math.random() * 2 * Math.PI);
 		state = new NullState();
-		
+
 	}
 
 	/**
@@ -162,6 +162,15 @@ public class LadyBird {
 		}
 	}
 
+	public boolean S_hasCollide(LadyBird other) {
+		if (Point2D.distance(other.getX(), other.getY(), x, y) < (other
+				.getSize() + settings.getHalfLadyBirdSize())) {
+
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Turns the ladybird slightly towards the goal.
 	 * 
@@ -230,7 +239,8 @@ public class LadyBird {
 	 * 
 	 * @param size
 	 *            Half the ladybirds size (radius).
-	 * @param notifyObservers TODO
+	 * @param notifyObservers
+	 *            TODO
 	 */
 	public void setSize(int size, boolean notifyObservers) {
 		settings.S_setSize(size, notifyObservers);
@@ -270,7 +280,8 @@ public class LadyBird {
 	 *            Color of the body.
 	 * @param dotColor
 	 *            Color of dots and border.
-	 * @param notifyObservers TODO
+	 * @param notifyObservers
+	 *            TODO
 	 */
 	public void setColors(Color color, Color dotColor, boolean notifyObservers) {
 		settings.S_setColors(color, dotColor, notifyObservers);
